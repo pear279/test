@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>十二星座介绍</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC",
+        "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background: radial-gradient(circle at top, #1b2559 0, #050716 45%, #000 80%);
+      color: #f5f7ff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .star-bg {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        radial-gradient(2px 2px at 10% 20%, rgba(255, 255, 255, 0.45), transparent),
+        radial-gradient(1.5px 1.5px at 80% 10%, rgba(255, 255, 255, 0.35), transparent),
+        radial-gradient(1.5px 1.5px at 30% 80%, rgba(255, 255, 255, 0.25), transparent),
+        radial-gradient(2px 2px at 70% 60%, rgba(255, 255, 255, 0.3), transparent);
+      opacity: 0.8;
+      z-index: -1;
+    }
+
+    header {
+      padding: 24px 6vw 12px;
+      backdrop-filter: blur(18px);
+      background: linear-gradient(to bottom, rgba(8, 11, 40, 0.9), rgba(8, 11, 40, 0));
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .title {
+      font-size: clamp(26px, 3vw, 32px);
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #fdfbff;
+      text-align: center;
+    }
+
+    .subtitle {
+      margin-top: 10px;
+      font-size: 14px;
+      color: #c9cff9;
+      text-align: center;
+    }
+
+    .subtitle span {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(99, 118, 255, 0.3), rgba(220, 109, 255, 0.2));
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      box-shadow: 0 0 12px rgba(120, 132, 255, 0.4);
+    }
+
+    main {
+      flex: 1;
+      padding: 10px 6vw 40px;
+      max-width: 1160px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .intro {
+      margin: 18px 0 22px;
+      padding: 14px 18px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: linear-gradient(135deg, rgba(9, 11, 42, 0.9), rgba(28, 12, 64, 0.95));
+      box-shadow:
+        0 18px 40px rgba(0, 0, 0, 0.7),
+        0 0 30px rgba(121, 134, 255, 0.35);
+      font-size: 14px;
+      line-height: 1.8;
+      color: #dde3ff;
+    }
+
+    .intro strong {
+      color: #ffe082;
+    }
+
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      font-size: 13px;
+      color: #cfd4ff;
+    }
+
+    .filter-label {
+      opacity: 0.9;
+    }
+
+    .filter-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(13, 17, 64, 0.8);
+      color: #e3e5ff;
+      cursor: pointer;
+      transition: all 0.18s ease-out;
+    }
+
+    .chip:hover {
+      border-color: #ffca28;
+      box-shadow: 0 0 16px rgba(255, 202, 40, 0.5);
+      transform: translateY(-1px);
+    }
+
+    .chip.active {
+      background: linear-gradient(135deg, #ffca28, #ff6f61);
+      color: #1b1030;
+      box-shadow: 0 0 18px rgba(255, 193, 7, 0.75);
+      border-color: transparent;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    @media (max-width: 1024px) {
+      .grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 768px) {
+      header {
+        padding-inline: 4vw;
+      }
+
+      main {
+        padding-inline: 4vw;
+      }
+
+      .grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 540px) {
+      .grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .card {
+      position: relative;
+      border-radius: 18px;
+      padding: 14px 14px 16px;
+      background: radial-gradient(circle at top, rgba(150, 171, 255, 0.4), rgba(19, 21, 66, 0.96));
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      box-shadow:
+        0 16px 30px rgba(0, 0, 0, 0.7),
+        0 0 24px rgba(100, 141, 255, 0.6);
+      overflow: hidden;
+      transition: transform 0.18s ease-out, box-shadow 0.18s ease-out, border-color 0.18s ease-out;
+      backdrop-filter: blur(14px);
+    }
+
+    .card:hover {
+      transform: translateY(-6px) translateZ(0);
+      box-shadow:
+        0 26px 60px rgba(0, 0, 0, 0.85),
+        0 0 30px rgba(141, 182, 255, 0.9);
+      border-color: rgba(255, 224, 130, 0.9);
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 10% -10%, rgba(255, 255, 255, 0.26), transparent 55%);
+      opacity: 0;
+      transition: opacity 0.18s ease-out;
+      pointer-events: none;
+    }
+
+    .card:hover::before {
+      opacity: 1;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .card-name {
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #fffef8;
+    }
+
+    .card-name span {
+      display: block;
+      font-size: 13px;
+      font-weight: 400;
+      letter-spacing: 0.05em;
+      color: #ffe082;
+      margin-top: 2px;
+    }
+
+    .card-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at 30% 20%, #fff3e0, #ff9800);
+      color: #311b00;
+      font-size: 22px;
+      box-shadow: 0 0 18px rgba(255, 193, 7, 0.9);
+      flex-shrink: 0;
+    }
+
+    .card-date {
+      font-size: 12px;
+      color: #d7dcff;
+      margin-bottom: 6px;
+    }
+
+    .card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 8px;
+      font-size: 11px;
+    }
+
+    .tag {
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(159, 173, 255, 0.8);
+      color: #e0e7ff;
+      white-space: nowrap;
+    }
+
+    .tag.element {
+      border-color: #80deea;
+      color: #e0ffff;
+    }
+
+    .tag.quality {
+      border-color: #ffab91;
+      color: #ffe0b2;
+    }
+
+    .card-desc {
+      font-size: 12px;
+      line-height: 1.7;
+      color: #f0f4ff;
+      margin-bottom: 6px;
+    }
+
+    .card-tip {
+      font-size: 11px;
+      color: #cfd8ff;
+      opacity: 0.95;
+    }
+
+    .card-tip strong {
+      color: #ffecb3;
+    }
+
+    footer {
+      padding: 14px 0 22px;
+      text-align: center;
+      font-size: 11px;
+      color: #a5b4ff;
+      opacity: 0.9;
+    }
+  </style>
+</head>
+<body>
+  <div class="star-bg" aria-hidden="true"></div>
+
+  <header>
+    <div class="title">ZODIAC · 十二星座</div>
+    <p class="subtitle">
+      <span>基于西方占星学的十二星座简介，仅供娱乐与自我观察参考</span>
+    </p>
+  </header>
+
+  <main>
+    <section class="intro">
+      在西方占星学中，<strong>十二星座</strong>是按照太阳在一年中经过黄道带的位置划分的十二个区间，每个星座都被认为对应着不同的
+      <strong>性格特点、行为模式与能量氛围</strong>。传统上，我们更关注太阳星座，也就是你出生那天太阳所在的星座。
+      本页为你用简洁的文字，快速浏览每个星座的基本气质与小提示。
+    </section>
+
+    <section class="filter-bar" aria-label="星座元素筛选（装饰功能，无交互）">
+      <span class="filter-label">按四象性质浏览：</span>
+      <div class="filter-chips">
+        <button class="chip active" type="button">全部星座</button>
+        <button class="chip" type="button">火象：热情、行动</button>
+        <button class="chip" type="button">土象：务实、稳定</button>
+        <button class="chip" type="button">风象：理性、交流</button>
+        <button class="chip" type="button">水象：敏感、情感</button>
+      </div>
+    </section>
+
+    <section class="grid" aria-label="十二星座卡片">
+      <!-- 白羊座 -->
+      <article class="card">
+        <div class="card-header">
+          <h2 class="card-name">Aries<span>白羊座</span></h2>
+          <div class="card-icon">♈</div>
+        </div>
+        <p class="card-date">生日范围：3月21日 - 4月19日</p>
+        <div class="card-tags">
+          <span class="tag element">火象 · 主管星：火星</span>
+          <span class="tag quality">基本宫 · 关键字：行动、勇气</span>
+        </div>
+        <p class="card-desc">
+          白羊座像一束点燃的火焰，反应直接、热情真诚，敢想敢冲。喜欢新鲜感，不爱拖延，也讨厌复杂绕弯子。
+        </p>
+        <p class="card-tip">
+          小提示：<strong>冲劲十足是优点</strong>，行动前多想一步，学会倾听别人的节奏，会走得更远。
+        </p>
+      </article>
+
+      <!-- 金牛座 -->
+      <article class="card">
+        <div class="card-header">
+          <h2 class="card-name">Taurus<span>金牛座</span></h2>
+          <div class="card-icon">♉</div>
+        </div>
+        <p class="card-date">生日范围：4月20日 - 5月20日</p>
+        <div class="card-tags">
+          <span class="tag element">土象 · 主管星：金星</span>
+          <span class="tag quality">固定宫 · 关键字：稳定、感官</span>
+        </div>
+        <p class="card-desc">
+          金牛座脚踏实地，重视安全感，对金钱、物质、生活品质有自己的坚持，也拥有细腻的感官享受能力。
+        </p>
+        <p class="card-tip">
+          小提示：懂得珍惜与坚持很好，适当放松对“稳定”的执着，会发现生活的惊喜。
+        </p>
+      </article>
+
+      <!-- 双子座 -->
+      <article class="card">
+        <div class="card-header">
+          <h2 class="card-name">Gemini<span>双子座</span></h2>
+          <div class="card-icon">♊</div>
+        </div>
+        <p class="card-date">生日范围：5月21日 - 6月21日</p>
+        <div class="card-tags">
+          <span class="tag element">风象 · 主管星：水星</span>
+          <span class="tag quality">变动宫 · 关键字：好奇、沟通</span>
+        </div>
+        <p class="card-desc">
+          双子座思维灵活，信息敏锐，喜欢聊天、学习新东西，脑子转得快，有时也显得注意力分散、难以长时间专注。
+        </p>
+        <p class="card-tip">
+          小提示：给自己的好奇心一个方向，把点子落到实处，你会发现自己极具创造力。
+        </p>
+      </article>
+
+      <!-- 巨蟹座 -->
+      <article class="card">
+        <div class="card-header">
+          <h2 class="card-name">Cancer<span>巨蟹座</span></h2>
+          <div class="card-icon">♋</div>
+        </div>
+        <p class="card-date">生日范围：6月22日 - 7月22日</p>
+        <div class="card-tags">
+          <span class="tag element">水象 · 主管星：月亮</span>
+          <span class="tag quality">基本宫 · 关键字：温柔、保护</span>
+        </div>
+        <p class="card-desc">
+          巨蟹座重情重义，对家人和在乎的人非常照顾，情感细腻、敏感，外柔内韧，懂得用温暖的方式守护。
+        </p>
+        <p class="card-tip">
+          小提示：照顾别人的同时，也要照顾自己的感受，学会表达需求，而不是一味退缩。
+        </p>
+      </article>
+
+      <!-- 狮子座 -->
+      <article class="card">
+        <div class="card-header">
+          <h2 class="card-name">Leo<span>狮子座</span></h2>
+          <div class="card-icon">♌</div>
+        </div>
+        <p class="card-date">生日范围：7月23日 - 8月22日</p>
+        <div class="card-tags">
+          <span class="tag element">火象 · 主管星：太阳</span>
+          <span class="tag quality">固定宫 · 关键字：自信、舞台</span>
+        </div>
+        <p class="card-desc">
+          狮子座像聚光灯下的主角，热情、大方、有领导气场，渴望被认可，也愿意为在乎的人慷慨付出。
+        </p>
+        <p class="card-tip">
+          小提示：适度放下“面子”与控制欲，会让你的魅力更自然、更有人情味。
+        </p>
+      </article>
+
+      <!-- 处女座 -->
+      <article class="card">
+        <div class="card-header">
+          <h2 class="card-name">Virgo<span>处女座</span></h2>
+          <div class="card-icon">♍</div>
+        </div>
+        <p class="card-date">生日范围：8月23日 - 9月22日</p>
+        <div class="card-tags">
+          <span class="tag element">土象 · 主管星：水星</span>
+          <span class="tag quality">变动宫 · 关键字：细节、服务</span>
+        </div>
+        <p class="card-desc">
+          处女座注重细节与秩序，有很强的分析能力和改进意识，习惯追求“更好”的解决方案，有时候也容易自我苛求。
+        </p>
+        <p class="card-tip">
+          小提示：对世界的挑剔，其实源自你对完美的期望。请也学着温柔地接纳“不完美的自己”。
+        </p>
+      </article>
+
+      <!-- 天秤座 -->
+      <article class="card">
+        <div class="card-header">
+          <h2 class="card-name">Libra<span>天秤座</span></h2>
+          <div class="card-icon">♎</div>
+        </div>
+        <p class="card-date">生日范围：9月23日 - 10月23日</p>
+        <div class="card-tags">
+          <span class="tag element">风象 · 主管星：金星</span>
+          <span class="tag quality">基本宫 · 关键字：平衡、人际</span>
+        </div>
+        <p class="card-desc">
+          天秤座擅长从不同角度看问题，既注重公平，也重视关系中的和谐，气质温和，有审美与社交方面的天赋。
+        </p>
+        <p class="card-tip">
+          小提示：学会在“照顾大家”与“忠于自己”之间做选择，真正的平衡来自内心的坚定。
+        </p>
+      </article>
+
+      <!-- 天蝎座 -->
+      <article class="card">
+        <div class="card-header">
+          <h2 class="card-name">Scorpio<span>天蝎座</span></h2>
+          <div class="card-icon">♏</div>
+        </div>
+        <p class="card-date">生日范围：10月24日 - 11月22日</p>
+        <div class="card-tags">
+          <span class="tag element">水象 · 主管星：冥王星 / 火星</span>
+          <span class="tag quality">固定宫 · 关键字：深度、洞察</span>
+        </div>
+        <p class="card-desc">
+          天蝎座情感浓烈、直觉敏锐，善于看穿表象，重视信任与忠诚，对待喜欢的事和人都很投入。
+        </p>
+        <p class="card-tip">
+          小提示：适度表达脆弱，不把一切情绪都藏起来，会让关系更真实，也让自己更轻松。
+        </p>
+      </article>
+
+      <!-- 射手座 -->
+      <article class="card">
+        <div class="card-header">
+          <h2 class="card-name">Sagittarius<span>射手座</span></h2>
+          <div class="card-icon">♐</div>
+        </div>
+        <p class="card-date">生日范围：11月23日 - 12月21日</p>
+        <div class="card-tags">
+          <span class="tag element">火象 · 主管星：木星</span>
+          <span class="tag quality">变动宫 · 关键字：自由、探索</span>
+        </div>
+        <p class="card-desc">
+          射手座热爱自由，追求真理与远方，性格乐观直接，说话耿直，有时也因为坦率而显得不够细腻。
+        </p>
+        <p class="card-tip">
+          小提示：在保持潇洒与真诚的同时，多一点耐心与体贴，会让你的魅力升级。
+        </p>
+      </article>
+
+      <!-- 摩羯座 -->
+      <article class="card">
+        <div class="card-header">
+          <h2 class="card-name">Capricorn<span>摩羯座</span></h2>
+          <div class="card-icon">♑</div>
+        </div>
+        <p class="card-date">生日范围：12月22日 - 次年1月19日</p>
+        <div class="card-tags">
+          <span class="tag element">土象 · 主管星：土星</span>
+          <span class="tag quality">基本宫 · 关键字：责任、成就</span>
+        </div>
+        <p class="card-desc">
+          摩羯座目标感很强，踏实、稳重，有耐心，愿意为长远的成果打基础。外表冷静，内心其实非常可靠与柔软。
+        </p>
+        <p class="card-tip">
+          小提示：别忘了在爬山的路上偶尔停下脚步，看看风景，也让身边的人知道你的在乎。
+        </p>
+      </article>
+
+      <!-- 水瓶座 -->
+      <article class="card">
+        <div class="card-header">
+          <h2 class="card-name">Aquarius<span>水瓶座</span></h2>
+          <div class="card-icon">♒</div>
+        </div>
+        <p class="card-date">生日范围：1月20日 - 2月18日</p>
+        <div class="card-tags">
+          <span class="tag element">风象 · 主管星：天王星 / 土星</span>
+          <span class="tag quality">固定宫 · 关键字：独立、理想</span>
+        </div>
+        <p class="card-desc">
+          水瓶座思维前卫，重视个人独立与精神空间，喜欢新观念、新科技，也关心人类整体和社会议题。
+        </p>
+        <p class="card-tip">
+          小提示：在坚持“与众不同”的同时，也允许自己在亲密关系中示弱、依赖，这是另一种勇敢。
+        </p>
+      </article>
+
+      <!-- 双鱼座 -->
+      <article class="card">
+        <div class="card-header">
+          <h2 class="card-name">Pisces<span>双鱼座</span></h2>
+          <div class="card-icon">♓</div>
+        </div>
+        <p class="card-date">生日范围：2月19日 - 3月20日</p>
+        <div class="card-tags">
+          <span class="tag element">水象 · 主管星：海王星 / 木星</span>
+          <span class="tag quality">变动宫 · 关键字：想象、共情</span>
+        </div>
+        <p class="card-desc">
+          双鱼座感受力极强，容易被情绪和氛围影响，拥有丰富的想象力与同理心，适合艺术、疗愈与创造性的领域。
+        </p>
+        <p class="card-tip">
+          小提示：在照顾他人情绪之前，先确认自己的界限，把温柔也留一部分给自己。
+        </p>
+      </article>
+    </section>
+  </main>
+
+  <footer>
+    星座内容为概括性描述，不代表全部个体。若想更深入了解自己，可进一步查询星盘与上升、月亮等位置。
+  </footer>
+</body>
+</html>
